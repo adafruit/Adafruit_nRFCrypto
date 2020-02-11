@@ -45,27 +45,14 @@ static const uint8_t digest_len_arr[] =
 //------------- IMPLEMENTATION -------------//
 Adafruit_nRFCrypto_Hash::Adafruit_nRFCrypto_Hash(void)
 {
-  _context = NULL;
   _digest_len = 0;
 }
 
-bool Adafruit_nRFCrypto_Hash::begin(void)
-{
-  _context = (CRYS_HASHUserContext_t*) rtos_malloc(sizeof(CRYS_HASHUserContext_t));
-  return _context != NULL;
-}
-
-void Adafruit_nRFCrypto_Hash::end(void)
-{
-  rtos_free(_context);
-  _context = NULL;
-}
-
-bool Adafruit_nRFCrypto_Hash::init(CRYS_HASH_OperationMode_t mode)
+bool Adafruit_nRFCrypto_Hash::begin(CRYS_HASH_OperationMode_t mode)
 {
   nRFCrypto.enable();
 
-  VERIFY_ERROR( CRYS_HASH_Init(_context, mode), false );
+  VERIFY_ERROR( CRYS_HASH_Init(&_context, mode), false );
   if ( mode < CRYS_HASH_NumOfModes ) _digest_len = digest_len_arr[mode];
 
   nRFCrypto.disable();
@@ -75,15 +62,15 @@ bool Adafruit_nRFCrypto_Hash::init(CRYS_HASH_OperationMode_t mode)
 bool Adafruit_nRFCrypto_Hash::update(uint8_t data[], size_t size)
 {
   nRFCrypto.enable();
-  VERIFY_ERROR( CRYS_HASH_Update(_context, data, size), false );
+  VERIFY_ERROR( CRYS_HASH_Update(&_context, data, size), false );
   nRFCrypto.disable();
   return true;
 }
 
-uint8_t Adafruit_nRFCrypto_Hash::finish(uint32_t result[16])
+uint8_t Adafruit_nRFCrypto_Hash::end(uint32_t result[16])
 {
   nRFCrypto.enable();
-  VERIFY_ERROR( CRYS_HASH_Finish(_context, result), 0);
+  VERIFY_ERROR( CRYS_HASH_Finish(&_context, result), 0);
   nRFCrypto.disable();
 
   return _digest_len;

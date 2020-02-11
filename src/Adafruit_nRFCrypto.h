@@ -36,10 +36,10 @@ class Adafruit_nRFCrypto
     Adafruit_nRFCrypto(void);
 
     bool begin(void);
+    void end(void);
+
     void enable(void);
     void disable(void);
-
-    Adafruit_nRFCrypto_Hash Hash;
 
   private:
 };

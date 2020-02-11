@@ -29,6 +29,8 @@ uint8_t input_data[] =
 //		0xdf,0x5f,0x54,0xc9,0x59,0x0f,0x32,0xa9,0x91,0x1f,0x16,0xfa,0xe8,0x7e,0x0a,0x2f
 };
 
+Adafruit_nRFCrypto_Hash hash;
+
 // the setup function runs once when you press reset or power the board
 void setup()
 {
@@ -39,7 +41,6 @@ void setup()
   Serial.println("nRFCrypto Hash example");
 
   nRFCrypto.begin();
-  nRFCrypto.Hash.begin();
 
   test_hash(CRYS_HASH_SHA1_mode   , "SHA1  ");
   test_hash(CRYS_HASH_SHA224_mode , "SHA224");
@@ -48,7 +49,8 @@ void setup()
   test_hash(CRYS_HASH_SHA512_mode , "SHA512");
 //  test_hash(CRYS_HASH_MD5_mode    , "MD5");
 
-  nRFCrypto.Hash.end();
+  nRFCrypto.end();
+
 }
 
 void test_hash(uint32_t mode, const char* modestr)
@@ -56,9 +58,9 @@ void test_hash(uint32_t mode, const char* modestr)
   uint32_t result[16];
   uint8_t  result_len; // depending on Hash mode
 
-  nRFCrypto.Hash.init(mode);
-  nRFCrypto.Hash.update(input_data, sizeof(input_data));
-  result_len = nRFCrypto.Hash.finish(result);
+  hash.begin(mode);
+  hash.update(input_data, sizeof(input_data));
+  result_len = hash.end(result);
 
   Serial.print(modestr);
   Serial.print(" : ");

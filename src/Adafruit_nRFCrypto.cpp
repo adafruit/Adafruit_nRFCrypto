@@ -58,6 +58,18 @@ bool Adafruit_nRFCrypto::begin(void)
   return true;
 }
 
+void Adafruit_nRFCrypto::end(void)
+{
+  enable();
+
+  SaSi_LibFini();
+//  CRYS_RND_UnInstantiation()
+
+  NVIC_DisableIRQ(CRYPTOCELL_IRQn);
+
+  disable();
+}
+
 void Adafruit_nRFCrypto::enable(void)
 {
   NRF_CRYPTOCELL->ENABLE = 1;

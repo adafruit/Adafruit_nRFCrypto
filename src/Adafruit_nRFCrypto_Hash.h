@@ -27,32 +27,27 @@
 
 #include "nrf_cc310/include/crys_hash.h"
 
-
-
 class Adafruit_nRFCrypto_Hash
 {
   public:
     Adafruit_nRFCrypto_Hash(void);
 
-    bool begin(void);
-    void end(void);
-
-    bool init(CRYS_HASH_OperationMode_t mode);
-    bool init(uint32_t mode)
+    bool begin(CRYS_HASH_OperationMode_t mode);
+    bool begin(uint32_t mode)
     {
-      return init ((CRYS_HASH_OperationMode_t) mode);
+      return begin ((CRYS_HASH_OperationMode_t) mode);
     }
 
     bool update(uint8_t data[], size_t size);
 
-    uint8_t finish(uint32_t result[16]);
-    uint8_t finish(uint8_t  result[64])
+    uint8_t end(uint32_t result[16]);
+    uint8_t end(uint8_t  result[64])
     {
-      return finish((uint32_t*) result);
+      return end((uint32_t*) result);
     }
 
   private:
-    CRYS_HASHUserContext_t* _context;
+    CRYS_HASHUserContext_t _context;
     uint8_t _digest_len;
 };
 
