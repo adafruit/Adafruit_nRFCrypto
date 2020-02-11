@@ -22,28 +22,38 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_H_
-#define ADAFRUIT_NRFCRYPTO_H_
+#ifndef ADAFRUIT_NRFCRYPTO_HASH_H_
+#define ADAFRUIT_NRFCRYPTO_HASH_H_
 
-#include "nrf_cc310/include/sns_silib.h"
-#include "nrf_cc310/include/crys_rnd.h"
+#include "nrf_cc310/include/crys_hash.h"
 
-#include "Adafruit_nRFCrypto_Hash.h"
 
-class Adafruit_nRFCrypto
+
+class Adafruit_nRFCrypto_Hash
 {
   public:
-    Adafruit_nRFCrypto(void);
+    Adafruit_nRFCrypto_Hash(void);
 
     bool begin(void);
-    void enable(void);
-    void disable(void);
+    void end(void);
 
-    Adafruit_nRFCrypto_Hash Hash;
+    bool init(CRYS_HASH_OperationMode_t mode);
+    bool init(uint32_t mode)
+    {
+      return init ((CRYS_HASH_OperationMode_t) mode);
+    }
+
+    bool update(uint8_t data[], size_t size);
+
+    uint8_t finish(uint32_t result[16]);
+    uint8_t finish(uint8_t  result[64])
+    {
+      return finish((uint32_t*) result);
+    }
 
   private:
+    CRYS_HASHUserContext_t* _context;
+    uint8_t _digest_len;
 };
 
-extern Adafruit_nRFCrypto nRFCrypto;
-
-#endif /* ADAFRUIT_NRFCRYPTO_H_ */
+#endif /* ADAFRUIT_NRFCRYPTO_HASH_H_ */

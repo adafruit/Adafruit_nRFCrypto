@@ -22,48 +22,72 @@
  * THE SOFTWARE.
  */
 
-#include "variant.h"
 #include "common_inc.h"
+#include "rtos.h"
 #include "Adafruit_nRFCrypto.h"
-
-// Only nRF52840 has CC310
-#ifndef NRF_CRYPTOCELL
-  #error CryptoCell CC310 is not supported on this board
-#endif
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
 
-Adafruit_nRFCrypto nRFCrypto;
+// Length of Digest Op mode in bytes
+static const uint8_t digest_len_arr[] =
+{
+  CRYS_HASH_SHA1_DIGEST_SIZE_IN_BYTES,
+  CRYS_HASH_SHA224_DIGEST_SIZE_IN_BYTES,
+  CRYS_HASH_SHA256_DIGEST_SIZE_IN_BYTES,
+  CRYS_HASH_SHA384_DIGEST_SIZE_IN_BYTES,
+  CRYS_HASH_SHA512_DIGEST_SIZE_IN_BYTES,
+  CRYS_HASH_MD5_DIGEST_SIZE_IN_BYTES
+};
+
 
 //------------- IMPLEMENTATION -------------//
-
-Adafruit_nRFCrypto::Adafruit_nRFCrypto(void)
+Adafruit_nRFCrypto_Hash::Adafruit_nRFCrypto_Hash(void)
 {
-
+  _context = NULL;
+  _digest_len = 0;
 }
 
-bool Adafruit_nRFCrypto::begin(void)
+bool Adafruit_nRFCrypto_Hash::begin(void)
 {
-  NVIC_SetPriority(CRYPTOCELL_IRQn, 2);
-  NVIC_EnableIRQ(CRYPTOCELL_IRQn);
+  _context = (CRYS_HASHUserContext_t*) rtos_malloc(sizeof(CRYS_HASHUserContext_t));
+  return _context != NULL;
+}
 
-  enable();
+void Adafruit_nRFCrypto_Hash::end(void)
+{
+  rtos_free(_context);
+  _context = NULL;
+}
 
-  VERIFY_ERROR(SaSi_LibInit(), false);
+bool Adafruit_nRFCrypto_Hash::init(CRYS_HASH_OperationMode_t mode)
+{
+  nRFCrypto.enable();
 
-  disable();
+  VERIFY_ERROR( CRYS_HASH_Init(_context, mode), false );
+  if ( mode < CRYS_HASH_NumOfModes ) _digest_len = digest_len_arr[mode];
 
+  nRFCrypto.disable();
   return true;
 }
 
-void Adafruit_nRFCrypto::enable(void)
+bool Adafruit_nRFCrypto_Hash::update(uint8_t data[], size_t size)
 {
-  NRF_CRYPTOCELL->ENABLE = 1;
+  nRFCrypto.enable();
+  VERIFY_ERROR( CRYS_HASH_Update(_context, data, size), false );
+  nRFCrypto.disable();
+  return true;
 }
 
-void Adafruit_nRFCrypto::disable(void)
+uint8_t Adafruit_nRFCrypto_Hash::finish(uint32_t result[16])
 {
-  NRF_CRYPTOCELL->ENABLE = 0;
+  nRFCrypto.enable();
+  VERIFY_ERROR( CRYS_HASH_Finish(_context, result), 0);
+  nRFCrypto.disable();
+
+  return _digest_len;
 }
+
+
+
