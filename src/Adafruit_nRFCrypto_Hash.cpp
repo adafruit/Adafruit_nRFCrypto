@@ -22,8 +22,6 @@
  * THE SOFTWARE.
  */
 
-#include "common_inc.h"
-#include "rtos.h"
 #include "Adafruit_nRFCrypto.h"
 
 //--------------------------------------------------------------------+

@@ -41,7 +41,7 @@ Adafruit_nRFCrypto nRFCrypto;
 
 Adafruit_nRFCrypto::Adafruit_nRFCrypto(void)
 {
-
+  _en_count = 0;
 }
 
 bool Adafruit_nRFCrypto::begin(void)
@@ -72,10 +72,22 @@ void Adafruit_nRFCrypto::end(void)
 
 void Adafruit_nRFCrypto::enable(void)
 {
+  _en_count++;
   NRF_CRYPTOCELL->ENABLE = 1;
 }
 
 void Adafruit_nRFCrypto::disable(void)
 {
-  NRF_CRYPTOCELL->ENABLE = 0;
+  _en_count--;
+
+  if ( _en_count == 0)
+  {
+    NRF_CRYPTOCELL->ENABLE = 0;
+  }
+}
+
+
+extern "C"
+{
+
 }

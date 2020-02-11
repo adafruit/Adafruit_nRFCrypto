@@ -22,33 +22,28 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_H_
-#define ADAFRUIT_NRFCRYPTO_H_
+#include "Adafruit_nRFCrypto.h"
 
-#include "common_inc.h"
-#include "rtos.h"
+//--------------------------------------------------------------------+
+// MACRO TYPEDEF CONSTANT ENUM DECLARATION
+//--------------------------------------------------------------------+
 
-#include "nrf_cc310/include/sns_silib.h"
-#include "nrf_cc310/include/crys_rnd.h"
 
-#include "Adafruit_nRFCrypto_Random.h"
-#include "Adafruit_nRFCrypto_Hash.h"
-
-class Adafruit_nRFCrypto
+//------------- IMPLEMENTATION -------------//
+Adafruit_nRFCrypto_Random::Adafruit_nRFCrypto_Random(void)
 {
-  public:
-    Adafruit_nRFCrypto(void);
+}
 
-    bool begin(void);
-    void end(void);
+bool Adafruit_nRFCrypto_Random::begin(void)
+{
+  varclr(&_state);
+  varclr(&_workbuf);
 
-    void enable(void);
-    void disable(void);
+  nRFCrypto.enable();
 
-  private:
-    uint32_t _en_count;
-};
+  VERIFY_ERROR( CRYS_RndInit(&_state, &_workbuf), false );
 
-extern Adafruit_nRFCrypto nRFCrypto;
+  nRFCrypto.disable();
 
-#endif /* ADAFRUIT_NRFCRYPTO_H_ */
+  return true;
+}

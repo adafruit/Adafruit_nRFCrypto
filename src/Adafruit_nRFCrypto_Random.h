@@ -22,33 +22,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_H_
-#define ADAFRUIT_NRFCRYPTO_H_
+#ifndef ADAFRUIT_NRFCRYPTO_RANDOM_H_
+#define ADAFRUIT_NRFCRYPTO_RANDOM_H_
 
-#include "common_inc.h"
-#include "rtos.h"
-
-#include "nrf_cc310/include/sns_silib.h"
-#include "nrf_cc310/include/crys_rnd.h"
-
-#include "Adafruit_nRFCrypto_Random.h"
-#include "Adafruit_nRFCrypto_Hash.h"
-
-class Adafruit_nRFCrypto
+class Adafruit_nRFCrypto_Random
 {
   public:
-    Adafruit_nRFCrypto(void);
+    Adafruit_nRFCrypto_Random(void);
 
     bool begin(void);
-    void end(void);
-
-    void enable(void);
-    void disable(void);
 
   private:
-    uint32_t _en_count;
+    CRYS_RND_State_t _state;
+    CRYS_RND_WorkBuff_t _workbuf;
 };
 
-extern Adafruit_nRFCrypto nRFCrypto;
-
-#endif /* ADAFRUIT_NRFCRYPTO_H_ */
+#endif /* ADAFRUIT_NRFCRYPTO_RANDOM_H_ */
