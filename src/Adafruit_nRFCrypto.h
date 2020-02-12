@@ -47,8 +47,16 @@ class Adafruit_nRFCrypto
 
   private:
     uint32_t _en_count;
+    bool _begun;
 };
 
 extern Adafruit_nRFCrypto nRFCrypto;
+
+#if !CFG_DEBUG
+  #define VERIFY_CRYS         VERIFY_ERROR
+#else
+  #define VERIFY_CRYS(...)     _GET_3RD_ARG(__VA_ARGS__, VERIFY_ERR_2ARGS, VERIFY_ERR_1ARGS)(__VA_ARGS__, dbg_strerr_crys)
+  const char* dbg_strerr_crys(int32_t err);
+#endif
 
 #endif /* ADAFRUIT_NRFCRYPTO_H_ */
