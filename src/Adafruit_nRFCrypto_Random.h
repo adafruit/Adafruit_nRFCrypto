@@ -46,6 +46,7 @@ class Adafruit_nRFCrypto_Random
 
   private:
     CRYS_RND_State_t _state;
+    bool _begun;
 };
 
 #endif /* ADAFRUIT_NRFCRYPTO_RANDOM_H_ */

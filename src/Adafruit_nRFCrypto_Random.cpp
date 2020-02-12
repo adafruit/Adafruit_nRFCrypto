@@ -32,10 +32,15 @@
 //------------- IMPLEMENTATION -------------//
 Adafruit_nRFCrypto_Random::Adafruit_nRFCrypto_Random(void)
 {
+  _begun = false;
 }
 
 bool Adafruit_nRFCrypto_Random::begin(void)
 {
+  // skip if already called begin before
+  if (_begun) return true;
+  _begun = false;
+
   CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
   VERIFY(workbuf);
 
@@ -53,6 +58,10 @@ bool Adafruit_nRFCrypto_Random::begin(void)
 
 void Adafruit_nRFCrypto_Random::end(void)
 {
+  // skipped if not begin-ed
+  if (!_begun) return;
+  _begun = false;
+
   nRFCrypto.enable();
 
   uint32_t err = CRYS_RND_UnInstantiation(&_state);
