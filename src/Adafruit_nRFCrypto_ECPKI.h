@@ -26,22 +26,23 @@
 #define ADAFRUIT_NRFCRYPTO_ECPKI_H_
 
 #include "nrf_cc310/include/crys_ecpki_types.h"
+#include "nrf_cc310/include/crys_ecpki_error.h"
 
-class Adafruit_nRFCrypto_ECPKI
+class Adafruit_nRFCrypto_ECC
 {
   public:
-    Adafruit_nRFCrypto_ECPKI(void);
+    Adafruit_nRFCrypto_ECC(void);
 
-    bool begin(void);
+    bool begin(CRYS_ECPKI_DomainID_t id);
     void end(void);
 
-    bool setDomain(CRYS_ECPKI_DomainID_t id);
+    bool genKeyPair(CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key);
 
-    bool genKeyPair(Adafruit_nRFCrypto_Random& rnd, CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key);
+    uint32_t exportKey(CRYS_ECPKI_UserPublKey_t* pubkey, uint8_t* rawkey, uint32_t bufsize);
+    bool buildKey(CRYS_ECPKI_UserPublKey_t* pubkey, uint8_t* rawkey, uint32_t bufsize);
 
   private:
     const CRYS_ECPKI_Domain_t * _domain;
-//    CRYS_RND_State_t _state;
 };
 
 #endif /* ADAFRUIT_NRFCRYPTO_ECPKI_H_ */

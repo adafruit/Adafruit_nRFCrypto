@@ -26,6 +26,7 @@
 
 #include "nrf_cc310/include/crys_ecpki_domain.h"
 #include "nrf_cc310/include/crys_ecpki_kg.h"
+#include "nrf_cc310/include/crys_ecpki_build.h"
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -33,22 +34,12 @@
 
 
 //------------- IMPLEMENTATION -------------//
-Adafruit_nRFCrypto_ECPKI::Adafruit_nRFCrypto_ECPKI(void)
+Adafruit_nRFCrypto_ECC::Adafruit_nRFCrypto_ECC(void)
 {
   _domain = NULL;
 }
 
-
-bool Adafruit_nRFCrypto_ECPKI::begin(void)
-{
-  return true;
-}
-
-void Adafruit_nRFCrypto_ECPKI::end(void)
-{
-}
-
-bool Adafruit_nRFCrypto_ECPKI::setDomain(CRYS_ECPKI_DomainID_t id)
+bool Adafruit_nRFCrypto_ECC::begin(CRYS_ECPKI_DomainID_t id)
 {
   nRFCrypto.enable();
 
@@ -58,13 +49,19 @@ bool Adafruit_nRFCrypto_ECPKI::setDomain(CRYS_ECPKI_DomainID_t id)
   return _domain != NULL;
 }
 
-bool Adafruit_nRFCrypto_ECPKI::genKeyPair(Adafruit_nRFCrypto_Random& rnd, CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key)
+void Adafruit_nRFCrypto_ECC::end(void)
 {
+  _domain = NULL;
+}
+
+bool Adafruit_nRFCrypto_ECC::genKeyPair(CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key)
+{
+  CRYS_ECPKI_KG_TempData_t* tempbuf = (CRYS_ECPKI_KG_TempData_t*) rtos_malloc( sizeof(CRYS_ECPKI_KG_TempData_t) );
+  VERIFY(tempbuf);
+
   nRFCrypto.enable();
 
-  CRYS_ECPKI_KG_TempData_t* tempbuf = (CRYS_ECPKI_KG_TempData_t*) rtos_malloc( sizeof(CRYS_ECPKI_KG_TempData_t) );
-
-  uint32_t err = CRYS_ECPKI_GenKeyPair(rnd.getContext(), CRYS_RND_GenerateVector, _domain,
+  uint32_t err = CRYS_ECPKI_GenKeyPair(nRFCrypto.Random.getContext(), CRYS_RND_GenerateVector, _domain,
                                        private_key, public_key,
                                        tempbuf, NULL);
 
@@ -72,7 +69,39 @@ bool Adafruit_nRFCrypto_ECPKI::genKeyPair(Adafruit_nRFCrypto_Random& rnd, CRYS_E
 
   rtos_free(tempbuf);
 
-  VERIFY_ERROR(err, false);
+  VERIFY_CRYS(err, false);
+  return true;
+}
+
+// Export from internal type to raw bytes in Big Endian
+// return raw buffer size = keysize + 1 (header)
+uint32_t Adafruit_nRFCrypto_ECC::exportKey(CRYS_ECPKI_UserPublKey_t* pubkey, uint8_t* rawkey, uint32_t bufsize)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_ECPKI_ExportPublKey(pubkey, CRYS_EC_PointUncompressed, rawkey, &bufsize);
+
+  nRFCrypto.disable();
+
+  VERIFY_CRYS(err, 0);
+  return bufsize;
+}
+
+// Build public key from raw bytes in Big Endian
+bool Adafruit_nRFCrypto_ECC::buildKey(CRYS_ECPKI_UserPublKey_t* pubkey, uint8_t* rawkey, uint32_t bufsize)
+{
+  CRYS_ECPKI_BUILD_TempData_t* tempbuf = (CRYS_ECPKI_BUILD_TempData_t*) rtos_malloc( sizeof(CRYS_ECPKI_BUILD_TempData_t) );
+  VERIFY(tempbuf);
+
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_ECPKI_BuildPublKeyPartlyCheck(_domain, rawkey, bufsize, pubkey, tempbuf);
+
+  nRFCrypto.disable();
+
+  rtos_free(tempbuf);
+
+  VERIFY_CRYS(err, false);
   return true;
 }
 
