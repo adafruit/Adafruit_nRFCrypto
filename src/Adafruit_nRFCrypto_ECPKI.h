@@ -22,30 +22,26 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_RANDOM_H_
-#define ADAFRUIT_NRFCRYPTO_RANDOM_H_
+#ifndef ADAFRUIT_NRFCRYPTO_ECPKI_H_
+#define ADAFRUIT_NRFCRYPTO_ECPKI_H_
 
-#include "nrf_cc310/include/crys_rnd.h"
+#include "nrf_cc310/include/crys_ecpki_types.h"
 
-class Adafruit_nRFCrypto_Random
+class Adafruit_nRFCrypto_ECPKI
 {
   public:
-    Adafruit_nRFCrypto_Random(void);
+    Adafruit_nRFCrypto_ECPKI(void);
 
     bool begin(void);
     void end(void);
 
-    CRYS_RND_State_t* getContext(void);
+    bool setDomain(CRYS_ECPKI_DomainID_t id);
 
-    bool addAdditionalInput(uint8_t* input, uint16_t size);
-    bool reseed(void);
-    bool generate(uint8_t* buf, uint16_t count);
-    bool generateInRange(uint8_t* buf, uint32_t bitsize, uint8_t* max = NULL);
-
-    // enterKAtMode() DisableKatMoe()
+    bool genKeyPair(Adafruit_nRFCrypto_Random& rnd, CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key);
 
   private:
-    CRYS_RND_State_t _state;
+    const CRYS_ECPKI_Domain_t * _domain;
+//    CRYS_RND_State_t _state;
 };
 
-#endif /* ADAFRUIT_NRFCRYPTO_RANDOM_H_ */
+#endif /* ADAFRUIT_NRFCRYPTO_ECPKI_H_ */

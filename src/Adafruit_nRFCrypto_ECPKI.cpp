@@ -24,99 +24,55 @@
 
 #include "Adafruit_nRFCrypto.h"
 
+#include "nrf_cc310/include/crys_ecpki_domain.h"
+#include "nrf_cc310/include/crys_ecpki_kg.h"
+
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
 
 
 //------------- IMPLEMENTATION -------------//
-Adafruit_nRFCrypto_Random::Adafruit_nRFCrypto_Random(void)
+Adafruit_nRFCrypto_ECPKI::Adafruit_nRFCrypto_ECPKI(void)
+{
+  _domain = NULL;
+}
+
+
+bool Adafruit_nRFCrypto_ECPKI::begin(void)
+{
+  return true;
+}
+
+void Adafruit_nRFCrypto_ECPKI::end(void)
 {
 }
 
-bool Adafruit_nRFCrypto_Random::begin(void)
+bool Adafruit_nRFCrypto_ECPKI::setDomain(CRYS_ECPKI_DomainID_t id)
 {
-  CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
-  VERIFY(workbuf);
-
   nRFCrypto.enable();
 
-  uint32_t err = CRYS_RndInit(&_state, workbuf);
+  _domain = CRYS_ECPKI_GetEcDomain(id);
+
+  nRFCrypto.disable();
+  return _domain != NULL;
+}
+
+bool Adafruit_nRFCrypto_ECPKI::genKeyPair(Adafruit_nRFCrypto_Random& rnd, CRYS_ECPKI_UserPrivKey_t* private_key, CRYS_ECPKI_UserPublKey_t* public_key)
+{
+  nRFCrypto.enable();
+
+  CRYS_ECPKI_KG_TempData_t* tempbuf = (CRYS_ECPKI_KG_TempData_t*) rtos_malloc( sizeof(CRYS_ECPKI_KG_TempData_t) );
+
+  uint32_t err = CRYS_ECPKI_GenKeyPair(rnd.getContext(), CRYS_RND_GenerateVector, _domain,
+                                       private_key, public_key,
+                                       tempbuf, NULL);
 
   nRFCrypto.disable();
 
-  rtos_free(workbuf);
+  rtos_free(tempbuf);
 
   VERIFY_ERROR(err, false);
   return true;
 }
 
-void Adafruit_nRFCrypto_Random::end(void)
-{
-  nRFCrypto.enable();
-
-  uint32_t err = CRYS_RND_UnInstantiation(&_state);
-
-  nRFCrypto.disable();
-
-  VERIFY_ERROR(err, );
-}
-
-
-CRYS_RND_State_t* Adafruit_nRFCrypto_Random::getContext(void)
-{
-  return &_state;
-}
-
-bool Adafruit_nRFCrypto_Random::addAdditionalInput(uint8_t* input, uint16_t size)
-{
-  nRFCrypto.enable();
-
-  uint32_t err = CRYS_RND_AddAdditionalInput(&_state, input, size);
-
-  nRFCrypto.disable();
-
-  VERIFY_ERROR(err, false);
-  return true;
-}
-
-bool Adafruit_nRFCrypto_Random::reseed(void)
-{
-  CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
-  VERIFY(workbuf);
-
-  nRFCrypto.enable();
-
-  uint32_t err = CRYS_RND_Reseeding(&_state, workbuf);
-
-  nRFCrypto.disable();
-
-  rtos_free(workbuf);
-
-  VERIFY_ERROR(err, false);
-  return true;
-}
-
-bool Adafruit_nRFCrypto_Random::generate(uint8_t* buf, uint16_t bufsize)
-{
-  nRFCrypto.enable();
-
-  uint32_t err = CRYS_RND_GenerateVector(&_state, bufsize, buf);
-
-  nRFCrypto.disable();
-
-  VERIFY_ERROR(err, false);
-  return true;
-}
-
-bool Adafruit_nRFCrypto_Random::generateInRange(uint8_t* buf, uint32_t bitsize, uint8_t* max)
-{
-  nRFCrypto.enable();
-
-  uint32_t err = CRYS_RND_GenerateVectorInRange(&_state, CRYS_RND_GenerateVector, bitsize, max, buf);
-
-  nRFCrypto.disable();
-
-  VERIFY_ERROR(err, false);
-  return true;
-}
