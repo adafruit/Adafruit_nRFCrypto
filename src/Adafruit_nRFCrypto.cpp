@@ -24,12 +24,22 @@
 
 #include "variant.h"
 #include "common_inc.h"
+
+#include "nrf_cc310/include/sns_silib.h"
 #include "Adafruit_nRFCrypto.h"
 
 // Only nRF52840 has CC310
 #ifndef NRF_CRYPTOCELL
   #error CryptoCell CC310 is not supported on this board
 #endif
+
+// https://devzone.nordicsemi.com/f/nordic-q-a/40825/nrf52840-using-the-cryptocell310-with-a-preemptive-os
+// The cc310 lib doesn't work nicely with FreeRTOS, we either to
+// - Mask interrupts with most CC310 API with taskENTER_CRITICAL/taskEXIT_CRITICAL or
+// - Use no-interrupt version of lib c310 (which is what we did)
+//
+// Until Nordic "fixes" their implementation, we are better to use no-interrupt version
+#define USE_CC310_LIB_NO_INTERRUPT
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -46,12 +56,16 @@ Adafruit_nRFCrypto::Adafruit_nRFCrypto(void)
 
 bool Adafruit_nRFCrypto::begin(void)
 {
+
+#ifndef USE_CC310_LIB_NO_INTERRUPT
   NVIC_SetPriority(CRYPTOCELL_IRQn, 2);
   NVIC_EnableIRQ(CRYPTOCELL_IRQn);
+#endif
 
   enable();
 
   VERIFY_ERROR(SaSi_LibInit(), false);
+  VERIFY( Random.begin() );
 
   disable();
 
@@ -63,9 +77,11 @@ void Adafruit_nRFCrypto::end(void)
   enable();
 
   SaSi_LibFini();
-//  CRYS_RND_UnInstantiation()
+  Random.end();
 
+#ifndef USE_CC310_LIB_NO_INTERRUPT
   NVIC_DisableIRQ(CRYPTOCELL_IRQn);
+#endif
 
   disable();
 }

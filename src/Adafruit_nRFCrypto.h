@@ -28,9 +28,6 @@
 #include "common_inc.h"
 #include "rtos.h"
 
-#include "nrf_cc310/include/sns_silib.h"
-#include "nrf_cc310/include/crys_rnd.h"
-
 #include "Adafruit_nRFCrypto_Random.h"
 #include "Adafruit_nRFCrypto_Hash.h"
 
@@ -44,6 +41,8 @@ class Adafruit_nRFCrypto
 
     void enable(void);
     void disable(void);
+
+    Adafruit_nRFCrypto_Random Random;
 
   private:
     uint32_t _en_count;

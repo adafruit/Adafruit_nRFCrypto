@@ -36,14 +36,81 @@ Adafruit_nRFCrypto_Random::Adafruit_nRFCrypto_Random(void)
 
 bool Adafruit_nRFCrypto_Random::begin(void)
 {
-  varclr(&_state);
-  varclr(&_workbuf);
+  CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
+  VERIFY(workbuf);
 
   nRFCrypto.enable();
 
-  VERIFY_ERROR( CRYS_RndInit(&_state, &_workbuf), false );
+  uint32_t err = CRYS_RndInit(&_state, workbuf);
 
   nRFCrypto.disable();
 
+  rtos_free(workbuf);
+
+  VERIFY_ERROR(err, false);
+  return true;
+}
+
+void Adafruit_nRFCrypto_Random::end(void)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_RND_UnInstantiation(&_state);
+
+  nRFCrypto.disable();
+
+  VERIFY_ERROR(err, );
+}
+
+bool Adafruit_nRFCrypto_Random::addAdditionalInput(uint8_t* input, uint16_t size)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_RND_AddAdditionalInput(&_state, input, size);
+
+  nRFCrypto.disable();
+
+  VERIFY_ERROR(err, false);
+  return true;
+}
+
+bool Adafruit_nRFCrypto_Random::reseed(void)
+{
+  CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
+  VERIFY(workbuf);
+
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_RND_Reseeding(&_state, workbuf);
+
+  nRFCrypto.disable();
+
+  rtos_free(workbuf);
+
+  VERIFY_ERROR(err, false);
+  return true;
+}
+
+bool Adafruit_nRFCrypto_Random::generate(uint8_t* buf, uint16_t bufsize)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_RND_GenerateVector(&_state, bufsize, buf);
+
+  nRFCrypto.disable();
+
+  VERIFY_ERROR(err, false);
+  return true;
+}
+
+bool Adafruit_nRFCrypto_Random::generateInRange(uint8_t* buf, uint32_t bitsize, uint8_t* max)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_RND_GenerateVectorInRange(&_state, CRYS_RND_GenerateVector, bitsize, max, buf);
+
+  nRFCrypto.disable();
+
+  VERIFY_ERROR(err, false);
   return true;
 }
