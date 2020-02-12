@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_ECPKI_H_
-#define ADAFRUIT_NRFCRYPTO_ECPKI_H_
+#ifndef ADAFRUIT_NRFCRYPTO_ECC_H_
+#define ADAFRUIT_NRFCRYPTO_ECC_H_
 
 #include "nrf_cc310/include/crys_ecpki_types.h"
 #include "nrf_cc310/include/crys_ecpki_error.h"
@@ -45,4 +45,4 @@ class Adafruit_nRFCrypto_ECC
     const CRYS_ECPKI_Domain_t * _domain;
 };
 
-#endif /* ADAFRUIT_NRFCRYPTO_ECPKI_H_ */
+#endif /* ADAFRUIT_NRFCRYPTO_ECC_H_ */
