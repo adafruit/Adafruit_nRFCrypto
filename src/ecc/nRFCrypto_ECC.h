@@ -37,6 +37,7 @@ class nRFCrypto_ECC
   public:
     //------------- Static Members -------------//
     static bool genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& public_key);
+    static uint32_t SVDP_DH(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& peer_pubkey, uint8_t* shared_secret, uint32_t bufsize);
 
   public:
     nRFCrypto_ECC(void);

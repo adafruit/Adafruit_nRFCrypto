@@ -23,6 +23,7 @@
  */
 
 #include "nrf_cc310/include/crys_ecpki_kg.h"
+#include "nrf_cc310/include/crys_ecpki_dh.h"
 
 #include "Adafruit_nRFCrypto.h"
 
@@ -53,6 +54,23 @@ bool nRFCrypto_ECC::genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_
 
   VERIFY_CRYS(err, false);
   return true;
+}
+
+uint32_t nRFCrypto_ECC::SVDP_DH(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& peer_pubkey, uint8_t* shared_secret, uint32_t bufsize)
+{
+  CRYS_ECDH_TempData_t* tempbuf = (CRYS_ECDH_TempData_t *) rtos_malloc(sizeof(CRYS_ECDH_TempData_t));
+  VERIFY(tempbuf);
+
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_ECDH_SVDP_DH(&peer_pubkey._key, &private_key._key, shared_secret, &bufsize, tempbuf);
+
+  nRFCrypto.disable();
+
+  rtos_free(tempbuf);
+
+  VERIFY_CRYS(err, 0);
+  return bufsize;
 }
 
 nRFCrypto_ECC::nRFCrypto_ECC(void)
