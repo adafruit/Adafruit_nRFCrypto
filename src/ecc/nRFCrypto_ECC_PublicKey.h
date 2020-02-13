@@ -22,41 +22,30 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_H_
-#define ADAFRUIT_NRFCRYPTO_H_
+#ifndef NRFCRYPTO_ECC_PUBLICKEY_H_
+#define NRFCRYPTO_ECC_PUBLICKEY_H_
 
-#include "common_inc.h"
-#include "rtos.h"
+class Adafruit_nRFCrypto_ECC;
 
-#include "Adafruit_nRFCrypto_Random.h"
-#include "Adafruit_nRFCrypto_Hash.h"
-#include "ecc/Adafruit_nRFCrypto_ECC.h"
-
-class Adafruit_nRFCrypto
+class nRFCrypto_ECC_PublicKey
 {
   public:
-    Adafruit_nRFCrypto(void);
+    nRFCrypto_ECC_PublicKey(void);
 
-    bool begin(void);
+    bool begin(CRYS_ECPKI_DomainID_t id);
     void end(void);
 
-    void enable(void);
-    void disable(void);
+    const CRYS_ECPKI_Domain_t* getDomain(void) { return _domain; }
 
-    Adafruit_nRFCrypto_Random Random;
+    uint32_t toRaw(uint8_t* buffer, uint32_t bufsize);
+    bool     fromRaw(uint8_t* buffer, uint32_t bufsize);
 
   private:
-    uint32_t _en_count;
-    bool _begun;
+    const CRYS_ECPKI_Domain_t*  _domain;
+    CRYS_ECPKI_UserPublKey_t _key;
+
+    friend class Adafruit_nRFCrypto_ECC;
 };
 
-extern Adafruit_nRFCrypto nRFCrypto;
 
-#if !CFG_DEBUG
-  #define VERIFY_CRYS         VERIFY_ERROR
-#else
-  #define VERIFY_CRYS(...)     _GET_3RD_ARG(__VA_ARGS__, VERIFY_ERR_2ARGS, VERIFY_ERR_1ARGS)(__VA_ARGS__, dbg_strerr_crys)
-  const char* dbg_strerr_crys(int32_t err);
-#endif
-
-#endif /* ADAFRUIT_NRFCRYPTO_H_ */
+#endif /* NRFCRYPTO_ECC_PUBLICKEY_H_ */

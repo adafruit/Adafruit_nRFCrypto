@@ -27,48 +27,10 @@
 
 #include "nrf_cc310/include/crys_ecpki_types.h"
 #include "nrf_cc310/include/crys_ecpki_error.h"
+#include "nrf_cc310/include/crys_ecpki_domain.h"
 
-class Adafruit_nRFCrypto_ECC;
-
-class nRFCrypto_ECC_PublicKey
-{
-  public:
-    nRFCrypto_ECC_PublicKey(void);
-
-    bool begin(CRYS_ECPKI_DomainID_t id);
-    void end(void);
-
-    const CRYS_ECPKI_Domain_t* getDomain(void) { return _domain; }
-
-    uint32_t toRaw(uint8_t* buffer, uint32_t bufsize);
-    bool     fromRaw(uint8_t* buffer, uint32_t bufsize);
-
-  private:
-    const CRYS_ECPKI_Domain_t*  _domain;
-    CRYS_ECPKI_UserPublKey_t _key;
-
-    friend class Adafruit_nRFCrypto_ECC;
-};
-
-class nRFCrypto_ECC_PrivateKey
-{
-  public:
-    nRFCrypto_ECC_PrivateKey(void);
-
-    bool begin(CRYS_ECPKI_DomainID_t id);
-    void end(void);
-
-    const CRYS_ECPKI_Domain_t* getDomain(void) { return _domain; }
-
-    uint32_t toRaw(uint8_t* buffer, uint32_t bufsize);
-    bool     fromRaw(uint8_t* buffer, uint32_t bufsize);
-
-  private:
-    const CRYS_ECPKI_Domain_t*  _domain;
-    CRYS_ECPKI_UserPrivKey_t _key;
-
-    friend class Adafruit_nRFCrypto_ECC;
-};
+#include "nRFCrypto_ECC_PublicKey.h"
+#include "nRFCrypto_ECC_PrivateKey.h"
 
 class Adafruit_nRFCrypto_ECC
 {
@@ -78,13 +40,11 @@ class Adafruit_nRFCrypto_ECC
 
   public:
     Adafruit_nRFCrypto_ECC(void);
-    bool begin(CRYS_ECPKI_DomainID_t id);
+    bool begin(void);
     void end(void);
 
-    bool buildKey(CRYS_ECPKI_UserPublKey_t* pubkey, uint8_t* rawkey, uint32_t bufsize);
-
   private:
-    const CRYS_ECPKI_Domain_t * _domain;
+
 };
 
 #endif /* ADAFRUIT_NRFCRYPTO_ECC_H_ */

@@ -22,7 +22,8 @@
  * THE SOFTWARE.
  */
 
-#include "nrf_cc310/include/crys_ecpki_kg.h"
+
+#include "nrf_cc310/include/crys_ecpki_build.h"
 
 #include "Adafruit_nRFCrypto.h"
 
@@ -30,43 +31,51 @@
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
 
-//--------------------------------------------------------------------+
-// ECC
-//--------------------------------------------------------------------+
 
-bool Adafruit_nRFCrypto_ECC::genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& public_key)
+//------------- IMPLEMENTATION -------------//
+nRFCrypto_ECC_PrivateKey::nRFCrypto_ECC_PrivateKey(void)
 {
-  VERIFY( private_key.getDomain() == public_key.getDomain() );
+  _domain = NULL;
+}
 
-  CRYS_ECPKI_KG_TempData_t* tempbuf = (CRYS_ECPKI_KG_TempData_t*) rtos_malloc( sizeof(CRYS_ECPKI_KG_TempData_t) );
-  VERIFY(tempbuf);
-
+bool nRFCrypto_ECC_PrivateKey::begin(CRYS_ECPKI_DomainID_t id)
+{
   nRFCrypto.enable();
 
-  uint32_t err = CRYS_ECPKI_GenKeyPair(nRFCrypto.Random.getContext(), CRYS_RND_GenerateVector, private_key.getDomain(),
-                                       &private_key._key, &public_key._key,
-                                       tempbuf, NULL);
+  _domain = CRYS_ECPKI_GetEcDomain(id);
+
+  nRFCrypto.disable();
+  return _domain != NULL;
+}
+
+void nRFCrypto_ECC_PrivateKey::end(void)
+{
+  _domain = NULL;
+}
+
+// Export from internal type to raw bytes in Big Endian
+// return raw buffer size = keysize + 1 (header)
+uint32_t nRFCrypto_ECC_PrivateKey::toRaw(uint8_t* buffer, uint32_t bufsize)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_ECPKI_ExportPrivKey(&_key, buffer, &bufsize);
 
   nRFCrypto.disable();
 
-  rtos_free(tempbuf);
+  VERIFY_CRYS(err, 0);
+  return bufsize;
+}
+
+// Build public key from raw bytes in Big Endian
+bool nRFCrypto_ECC_PrivateKey::fromRaw(uint8_t* buffer, uint32_t bufsize)
+{
+  nRFCrypto.enable();
+
+  uint32_t err = CRYS_ECPKI_BuildPrivKey(_domain, buffer, bufsize, &_key);
+
+  nRFCrypto.disable();
 
   VERIFY_CRYS(err, false);
   return true;
 }
-
-Adafruit_nRFCrypto_ECC::Adafruit_nRFCrypto_ECC(void)
-{
-
-}
-
-bool Adafruit_nRFCrypto_ECC::begin(void)
-{
-  return true;
-}
-
-void Adafruit_nRFCrypto_ECC::end(void)
-{
-
-}
-
