@@ -30,12 +30,12 @@
 
 
 //------------- IMPLEMENTATION -------------//
-Adafruit_nRFCrypto_Random::Adafruit_nRFCrypto_Random(void)
+nRFCrypto_Random::nRFCrypto_Random(void)
 {
   _begun = false;
 }
 
-bool Adafruit_nRFCrypto_Random::begin(void)
+bool nRFCrypto_Random::begin(void)
 {
   // skip if already called begin before
   if (_begun) return true;
@@ -56,7 +56,7 @@ bool Adafruit_nRFCrypto_Random::begin(void)
   return true;
 }
 
-void Adafruit_nRFCrypto_Random::end(void)
+void nRFCrypto_Random::end(void)
 {
   // skipped if not begin-ed
   if (!_begun) return;
@@ -72,12 +72,12 @@ void Adafruit_nRFCrypto_Random::end(void)
 }
 
 
-CRYS_RND_State_t* Adafruit_nRFCrypto_Random::getContext(void)
+CRYS_RND_State_t* nRFCrypto_Random::getContext(void)
 {
   return &_state;
 }
 
-bool Adafruit_nRFCrypto_Random::addAdditionalInput(uint8_t* input, uint16_t size)
+bool nRFCrypto_Random::addAdditionalInput(uint8_t* input, uint16_t size)
 {
   nRFCrypto.enable();
 
@@ -89,7 +89,7 @@ bool Adafruit_nRFCrypto_Random::addAdditionalInput(uint8_t* input, uint16_t size
   return true;
 }
 
-bool Adafruit_nRFCrypto_Random::reseed(void)
+bool nRFCrypto_Random::reseed(void)
 {
   CRYS_RND_WorkBuff_t* workbuf = (CRYS_RND_WorkBuff_t*) rtos_malloc(sizeof(CRYS_RND_WorkBuff_t));
   VERIFY(workbuf);
@@ -106,7 +106,7 @@ bool Adafruit_nRFCrypto_Random::reseed(void)
   return true;
 }
 
-bool Adafruit_nRFCrypto_Random::generate(uint8_t* buf, uint16_t bufsize)
+bool nRFCrypto_Random::generate(uint8_t* buf, uint16_t bufsize)
 {
   nRFCrypto.enable();
 
@@ -118,7 +118,7 @@ bool Adafruit_nRFCrypto_Random::generate(uint8_t* buf, uint16_t bufsize)
   return true;
 }
 
-bool Adafruit_nRFCrypto_Random::generateInRange(uint8_t* buf, uint32_t bitsize, uint8_t* max)
+bool nRFCrypto_Random::generateInRange(uint8_t* buf, uint32_t bitsize, uint8_t* max)
 {
   nRFCrypto.enable();
 

@@ -28,7 +28,7 @@
 #include "common_inc.h"
 #include "rtos.h"
 
-#include "Adafruit_nRFCrypto_Random.h"
+#include "nRFCrypto_Random.h"
 #include "Adafruit_nRFCrypto_Hash.h"
 #include "ecc/nRFCrypto_ECC.h"
 
@@ -43,7 +43,7 @@ class Adafruit_nRFCrypto
     void enable(void);
     void disable(void);
 
-    Adafruit_nRFCrypto_Random Random;
+    nRFCrypto_Random Random;
 
   private:
     uint32_t _en_count;

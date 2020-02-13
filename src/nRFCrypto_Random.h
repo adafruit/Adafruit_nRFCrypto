@@ -22,15 +22,15 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_RANDOM_H_
-#define ADAFRUIT_NRFCRYPTO_RANDOM_H_
+#ifndef NRFCRYPTO_RANDOM_H_
+#define NRFCRYPTO_RANDOM_H_
 
 #include "nrf_cc310/include/crys_rnd.h"
 
-class Adafruit_nRFCrypto_Random
+class nRFCrypto_Random
 {
   public:
-    Adafruit_nRFCrypto_Random(void);
+    nRFCrypto_Random(void);
 
     bool begin(void);
     void end(void);
@@ -49,4 +49,4 @@ class Adafruit_nRFCrypto_Random
     bool _begun;
 };
 
-#endif /* ADAFRUIT_NRFCRYPTO_RANDOM_H_ */
+#endif /* NRFCRYPTO_RANDOM_H_ */
