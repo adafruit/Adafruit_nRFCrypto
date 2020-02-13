@@ -25,7 +25,7 @@
 #ifndef NRFCRYPTO_ECC_PRIVATEKEY_H_
 #define NRFCRYPTO_ECC_PRIVATEKEY_H_
 
-class Adafruit_nRFCrypto_ECC;
+class nRFCrypto_ECC;
 
 class nRFCrypto_ECC_PrivateKey
 {
@@ -44,7 +44,7 @@ class nRFCrypto_ECC_PrivateKey
     const CRYS_ECPKI_Domain_t*  _domain;
     CRYS_ECPKI_UserPrivKey_t _key;
 
-    friend class Adafruit_nRFCrypto_ECC;
+    friend class nRFCrypto_ECC;
 };
 
 #endif /* NRFCRYPTO_ECC_PRIVATEKEY_H_ */

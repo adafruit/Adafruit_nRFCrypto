@@ -25,7 +25,7 @@
 #ifndef NRFCRYPTO_ECC_PUBLICKEY_H_
 #define NRFCRYPTO_ECC_PUBLICKEY_H_
 
-class Adafruit_nRFCrypto_ECC;
+class nRFCrypto_ECC;
 
 class nRFCrypto_ECC_PublicKey
 {
@@ -44,7 +44,7 @@ class nRFCrypto_ECC_PublicKey
     const CRYS_ECPKI_Domain_t*  _domain;
     CRYS_ECPKI_UserPublKey_t _key;
 
-    friend class Adafruit_nRFCrypto_ECC;
+    friend class nRFCrypto_ECC;
 };
 
 

@@ -30,7 +30,7 @@
 
 #include "Adafruit_nRFCrypto_Random.h"
 #include "Adafruit_nRFCrypto_Hash.h"
-#include "ecc/Adafruit_nRFCrypto_ECC.h"
+#include "ecc/nRFCrypto_ECC.h"
 
 class Adafruit_nRFCrypto
 {

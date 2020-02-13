@@ -34,7 +34,7 @@
 // ECC
 //--------------------------------------------------------------------+
 
-bool Adafruit_nRFCrypto_ECC::genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& public_key)
+bool nRFCrypto_ECC::genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& public_key)
 {
   VERIFY( private_key.getDomain() == public_key.getDomain() );
 
@@ -55,17 +55,17 @@ bool Adafruit_nRFCrypto_ECC::genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, n
   return true;
 }
 
-Adafruit_nRFCrypto_ECC::Adafruit_nRFCrypto_ECC(void)
+nRFCrypto_ECC::nRFCrypto_ECC(void)
 {
 
 }
 
-bool Adafruit_nRFCrypto_ECC::begin(void)
+bool nRFCrypto_ECC::begin(void)
 {
   return true;
 }
 
-void Adafruit_nRFCrypto_ECC::end(void)
+void nRFCrypto_ECC::end(void)
 {
 
 }

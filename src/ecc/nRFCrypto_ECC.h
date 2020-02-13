@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_ECC_H_
-#define ADAFRUIT_NRFCRYPTO_ECC_H_
+#ifndef NRFCRYPTO_ECC_H_
+#define NRFCRYPTO_ECC_H_
 
 #include "nrf_cc310/include/crys_ecpki_types.h"
 #include "nrf_cc310/include/crys_ecpki_error.h"
@@ -32,14 +32,14 @@
 #include "nRFCrypto_ECC_PublicKey.h"
 #include "nRFCrypto_ECC_PrivateKey.h"
 
-class Adafruit_nRFCrypto_ECC
+class nRFCrypto_ECC
 {
   public:
     //------------- Static Members -------------//
     static bool genKeyPair(nRFCrypto_ECC_PrivateKey& private_key, nRFCrypto_ECC_PublicKey& public_key);
 
   public:
-    Adafruit_nRFCrypto_ECC(void);
+    nRFCrypto_ECC(void);
     bool begin(void);
     void end(void);
 
@@ -47,4 +47,4 @@ class Adafruit_nRFCrypto_ECC
 
 };
 
-#endif /* ADAFRUIT_NRFCRYPTO_ECC_H_ */
+#endif /* NRFCRYPTO_ECC_H_ */
