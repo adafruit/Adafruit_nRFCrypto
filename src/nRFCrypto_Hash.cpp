@@ -41,12 +41,12 @@ static const uint8_t digest_len_arr[] =
 
 
 //------------- IMPLEMENTATION -------------//
-Adafruit_nRFCrypto_Hash::Adafruit_nRFCrypto_Hash(void)
+nRFCrypto_Hash::nRFCrypto_Hash(void)
 {
   _digest_len = 0;
 }
 
-bool Adafruit_nRFCrypto_Hash::begin(CRYS_HASH_OperationMode_t mode)
+bool nRFCrypto_Hash::begin(CRYS_HASH_OperationMode_t mode)
 {
   nRFCrypto.enable();
 
@@ -57,7 +57,7 @@ bool Adafruit_nRFCrypto_Hash::begin(CRYS_HASH_OperationMode_t mode)
   return true;
 }
 
-bool Adafruit_nRFCrypto_Hash::update(uint8_t data[], size_t size)
+bool nRFCrypto_Hash::update(uint8_t data[], size_t size)
 {
   nRFCrypto.enable();
   VERIFY_ERROR( CRYS_HASH_Update(&_context, data, size), false );
@@ -65,7 +65,7 @@ bool Adafruit_nRFCrypto_Hash::update(uint8_t data[], size_t size)
   return true;
 }
 
-uint8_t Adafruit_nRFCrypto_Hash::end(uint32_t result[16])
+uint8_t nRFCrypto_Hash::end(uint32_t result[16])
 {
   nRFCrypto.enable();
   VERIFY_ERROR( CRYS_HASH_Finish(&_context, result), 0);

@@ -22,15 +22,15 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_HASH_H_
-#define ADAFRUIT_NRFCRYPTO_HASH_H_
+#ifndef NRFCRYPTO_HASH_H_
+#define NRFCRYPTO_HASH_H_
 
 #include "nrf_cc310/include/crys_hash.h"
 
-class Adafruit_nRFCrypto_Hash
+class nRFCrypto_Hash
 {
   public:
-    Adafruit_nRFCrypto_Hash(void);
+    nRFCrypto_Hash(void);
 
     bool begin(CRYS_HASH_OperationMode_t mode);
     bool begin(uint32_t mode)
@@ -51,4 +51,4 @@ class Adafruit_nRFCrypto_Hash
     uint8_t _digest_len;
 };
 
-#endif /* ADAFRUIT_NRFCRYPTO_HASH_H_ */
+#endif /* NRFCRYPTO_HASH_H_ */

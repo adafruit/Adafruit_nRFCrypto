@@ -29,7 +29,7 @@
 #include "rtos.h"
 
 #include "nRFCrypto_Random.h"
-#include "Adafruit_nRFCrypto_Hash.h"
+#include "nRFCrypto_Hash.h"
 #include "ecc/nRFCrypto_ECC.h"
 
 class Adafruit_nRFCrypto
