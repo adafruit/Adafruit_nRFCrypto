@@ -1,4 +1,4 @@
-# Adafruit nRFCrypo
+# Adafruit nRFCrypto
 
 Adafruit Arduino Cryptography Library using hardware-accelerated ARM CryptoCell CC310 on nRF52-based Bluefruit. CryptoCell CC310 is only available on nRF52840 therefore nRF52832 is not supported by this library.
 
