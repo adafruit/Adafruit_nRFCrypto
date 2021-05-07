@@ -1,4 +1,5 @@
 #include "Adafruit_nRFCrypto.h"
+#include <Adafruit_TinyUSB.h> // for Serial
 
 /* Input data for testing
  * Same data is stored in input_data.bin file, to verify the result, run hash sum on your PC

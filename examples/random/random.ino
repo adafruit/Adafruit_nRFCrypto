@@ -1,4 +1,5 @@
 #include "Adafruit_nRFCrypto.h"
+#include <Adafruit_TinyUSB.h> // for Serial
 
 // Bufer to hold randomized data
 uint8_t  buffer[32];
