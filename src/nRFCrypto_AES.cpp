@@ -28,7 +28,6 @@
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
 
-
 //------------- IMPLEMENTATION -------------//
 nRFCrypto_AES::nRFCrypto_AES(void) {
   _begun = false;
@@ -51,6 +50,7 @@ int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey
   /*
     msg:		the message you want to encrypt. does not need to be a multiple of 16 bytes.
     msgLen:		its length
+    IV:			the IV (16 bytes) for CBC
     pKey:		the key (16/24/32 bytes)
     pKeyLen:	its length
     retBuf:		the return buffer. MUST be a multiple of 16 bytes.
