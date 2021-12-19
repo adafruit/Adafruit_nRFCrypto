@@ -28,6 +28,7 @@
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
 
+
 //------------- IMPLEMENTATION -------------//
 nRFCrypto_AES::nRFCrypto_AES(void) {
   _begun = false;
@@ -55,11 +56,10 @@ int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey
     pKeyLen:	its length
     retBuf:		the return buffer. MUST be a multiple of 16 bytes.
     modeFlag:	encryptFlag / decryptFlag
-    opMode:		_ecbMode / _cbcMode
+    opMode:   ecbMode / cbcMode / ctrMode
   */
   if (!_begun) return -1;
   int ret = SaSi_LibInit();
-  // Serial.println("SaSi_LibInit: 0x" + String((int)ret, HEX));
   if (ret != SA_SILIB_RET_OK) return -2;
   if (pKeyLen % 8 != 0) return -3;
   if (pKeyLen < 16) return -3;
@@ -71,33 +71,47 @@ int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey
   keyData.keySize = pKeyLen;
   err = SaSi_AesSetKey(&pContext, _userKey, &keyData, sizeof(keyData));
   if (err != SASI_OK) return -4;
-  uint8_t cx, ln = msgLen, ptLen, modulo=0;
+  uint8_t cx, ln = msgLen, ptLen, modulo = 0;
   if (msgLen < 16) {
     ptLen = 16;
+    modulo = 16 - msgLen;
   } else {
     modulo = msgLen % 16;
-    if (modulo != 0) ptLen = (modulo + 1) * 16;
-    else ptLen = msgLen;
+    if (modulo != 0) {
+      uint8_t x = (msgLen/16);
+      ptLen = (x + 1) * 16;
+      modulo = 16 - modulo;
+    } else ptLen = msgLen;
   }
-  char pDataIn[ptLen];
-  memset(pDataIn, modulo, ptLen);
+  char pDataIn[ptLen] = {modulo};
   // Padding included!
-  char pDataOut[ptLen] = {0};
   memcpy(pDataIn, msg, msgLen);
+  size_t dataOutBuffSize;
+  char pDataOut[ptLen] = {0};
   if (ptLen > 16) {
     for (cx = 0; cx < ptLen - 16; cx += 16) {
       err = SaSi_AesBlock(&pContext, (uint8_t *) (pDataIn + cx), 16, (uint8_t *) (pDataOut + cx));
       if (err != SASI_OK) return -5;
     }
-  }
-  size_t dataOutBuffSize;
-  err = SaSi_AesFinish(
+    err = SaSi_AesFinish(
           &pContext,
           (size_t) 16,
           (uint8_t *) (pDataIn + cx),
           (size_t) 16,
           (uint8_t *) (pDataOut + cx),
           &dataOutBuffSize);
-  memcpy(retBuf, pDataOut, msgLen);
+  } else {
+    err = SaSi_AesBlock(&pContext, (uint8_t *) pDataIn, 16, (uint8_t *) pDataOut);
+    if (err != SASI_OK) return -5;
+    err = SaSi_AesFinish(
+          &pContext,
+          (size_t) 0,
+          (uint8_t *) (pDataIn),
+          (size_t) 0,
+          (uint8_t *) (pDataOut),
+          &dataOutBuffSize);
+    if (err != SASI_OK) return -6;
+  }
+  memcpy(retBuf, pDataOut, ptLen);
   return 0;
 }
