@@ -39,10 +39,11 @@ class nRFCrypto_AES {
     SaSiAesEncryptMode_t decryptFlag = (SaSiAesEncryptMode_t) 1; // SASI_AES_DECRYPT
     SaSiAesOperationMode_t ecbMode = (SaSiAesOperationMode_t) 0; // SASI_AES_MODE_ECB
     SaSiAesOperationMode_t cbcMode = (SaSiAesOperationMode_t) 1; // SASI_AES_MODE_CBC
+    SaSiAesOperationMode_t ctrMode = (SaSiAesOperationMode_t) 3; // SASI_AES_MODE_CTR
   private:
     bool _begun;
     SaSiAesPaddingType_t _paddingType = (SaSiAesPaddingType_t) 0; // SASI_AES_PADDING_NONE
     SaSiAesKeyType_t _userKey = (SaSiAesKeyType_t) 0; // SASI_AES_USER_KEY
 };
 
-#endif /* NRFCRYPTO_RANDOM_H_ */
+#endif /* NRFCRYPTO_RANDOM_H_ */ 
