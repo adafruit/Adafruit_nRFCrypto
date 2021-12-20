@@ -35,6 +35,7 @@ nRFCrypto_AES::nRFCrypto_AES(void) {
 }
 
 bool nRFCrypto_AES::begin() {
+  if (_begun == true) return true;
   _begun = false;
   int ret = SaSi_LibInit();
   if (ret == SA_SILIB_RET_OK) _begun = true;
@@ -42,20 +43,20 @@ bool nRFCrypto_AES::begin() {
 }
 
 void nRFCrypto_AES::end() {
-  _begun = true;
+  _begun = false;
   SaSi_LibFini();
 }
 
 int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey, uint8_t pKeyLen,
                            char *retBuf, SaSiAesEncryptMode_t modeFlag, SaSiAesOperationMode_t opMode) {
   /*
-    msg:		the message you want to encrypt. does not need to be a multiple of 16 bytes.
-    msgLen:		its length
-    IV:			the IV (16 bytes) for CBC
-    pKey:		the key (16/24/32 bytes)
-    pKeyLen:	its length
-    retBuf:		the return buffer. MUST be a multiple of 16 bytes.
-    modeFlag:	encryptFlag / decryptFlag
+    msg:    the message you want to encrypt. does not need to be a multiple of 16 bytes.
+    msgLen:   its length
+    IV:     the IV (16 bytes) for CBC
+    pKey:   the key (16/24/32 bytes)
+    pKeyLen:  its length
+    retBuf:   the return buffer. MUST be a multiple of 16 bytes.
+    modeFlag: encryptFlag / decryptFlag
     opMode:   ecbMode / cbcMode / ctrMode
   */
   if (!_begun) return -1;
@@ -78,7 +79,7 @@ int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey
   } else {
     modulo = msgLen % 16;
     if (modulo != 0) {
-      uint8_t x = (msgLen/16);
+      uint8_t x = (msgLen / 16);
       ptLen = (x + 1) * 16;
       modulo = 16 - modulo;
     } else ptLen = msgLen;
@@ -87,31 +88,31 @@ int nRFCrypto_AES::Process(char *msg, uint8_t msgLen, uint8_t *IV, uint8_t *pKey
   // Padding included!
   memcpy(pDataIn, msg, msgLen);
   size_t dataOutBuffSize;
-  char pDataOut[ptLen] = {0};
+  memset(retBuf, 0, ptLen);
   if (ptLen > 16) {
     for (cx = 0; cx < ptLen - 16; cx += 16) {
-      err = SaSi_AesBlock(&pContext, (uint8_t *) (pDataIn + cx), 16, (uint8_t *) (pDataOut + cx));
+      err = SaSi_AesBlock(&pContext, (uint8_t *) (pDataIn + cx), 16, (uint8_t *) (retBuf + cx));
       if (err != SASI_OK) return -5;
     }
     err = SaSi_AesFinish(
-          &pContext,
-          (size_t) 16,
-          (uint8_t *) (pDataIn + cx),
-          (size_t) 16,
-          (uint8_t *) (pDataOut + cx),
-          &dataOutBuffSize);
+            &pContext,
+            (size_t) 16,
+            (uint8_t *) (pDataIn + cx),
+            (size_t) 16,
+            (uint8_t *) (retBuf + cx),
+            &dataOutBuffSize);
+    if (err != SASI_OK) return -6;
   } else {
-    err = SaSi_AesBlock(&pContext, (uint8_t *) pDataIn, 16, (uint8_t *) pDataOut);
+    err = SaSi_AesBlock(&pContext, (uint8_t *) pDataIn, 16, (uint8_t *) retBuf);
     if (err != SASI_OK) return -5;
     err = SaSi_AesFinish(
-          &pContext,
-          (size_t) 0,
-          (uint8_t *) (pDataIn),
-          (size_t) 0,
-          (uint8_t *) (pDataOut),
-          &dataOutBuffSize);
+            &pContext,
+            (size_t) 0,
+            (uint8_t *) (pDataIn),
+            (size_t) 0,
+            (uint8_t *) (retBuf),
+            &dataOutBuffSize);
     if (err != SASI_OK) return -6;
   }
-  memcpy(retBuf, pDataOut, ptLen);
   return 0;
 }
