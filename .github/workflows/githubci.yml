@@ -8,8 +8,8 @@ jobs:
       fail-fast: false
       matrix:
         arduino-platform:
-          - 'cluenrf52840'
-          - 'cplaynrf52840'
+          - 'clue'
+          - 'cpb'
           - 'nrf52840'
 
     runs-on: ubuntu-latest
