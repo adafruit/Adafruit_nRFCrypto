@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2020 Ha Thach (tinyusb.org) for Adafruit Industries
+ * Copyright (c) 2023 Marcus Schmid (lanaticasylum.de)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,24 @@
  * THE SOFTWARE.
  */
 
-#ifndef ADAFRUIT_NRFCRYPTO_H_
-#define ADAFRUIT_NRFCRYPTO_H_
+#ifndef NRFCRYPTO_HMAC_H_
+#define NRFCRYPTO_HMAC_H_
 
-#include "common_inc.h"
-#include "rtos.h"
+#include "nrf_cc310/include/crys_hash.h"
+#include "nrf_cc310/include/crys_hmac.h"
 
-#include "nRFCrypto_Random.h"
-#include "nRFCrypto_Hash.h"
-#include "nRFCrypto_Hmac.h"
-#include "ecc/nRFCrypto_ECC.h"
-
-class Adafruit_nRFCrypto
+class nRFCrypto_Hmac
 {
   public:
-    Adafruit_nRFCrypto(void);
+    nRFCrypto_Hmac(void);
 
-    bool begin(void);
-    void end(void);
-
-    nRFCrypto_Random Random;
+    bool begin(CRYS_HASH_OperationMode_t mode, uint8_t *key_ptr, uint16_t keySize);
+    bool update(uint8_t data[], size_t size);
+    uint8_t end(uint32_t result[16]);
 
   private:
-    bool _begun;
+    CRYS_HMACUserContext_t _context;
+    uint8_t _digest_size;
 };
 
-extern Adafruit_nRFCrypto nRFCrypto;
-
-#if !CFG_DEBUG
-  #define VERIFY_CRYS         VERIFY_ERROR
-#else
-  #define VERIFY_CRYS(...)     _GET_3RD_ARG(__VA_ARGS__, VERIFY_ERR_2ARGS, VERIFY_ERR_1ARGS)(__VA_ARGS__, dbg_strerr_crys)
-  const char* dbg_strerr_crys(int32_t err);
-#endif
-
-#endif /* ADAFRUIT_NRFCRYPTO_H_ */
+#endif /* NRFCRYPTO_HMAC_H_ */
